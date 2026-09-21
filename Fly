@@ -1,0 +1,624 @@
+--========================================================
+-- ✈️ FLY PRO PANEL
+-- Roblox Studio Lite
+-- محل: StarterGui > LocalScript
+--========================================================
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local FLY_SPEED = 70
+local VERTICAL_SPEED = 55
+
+local character
+local humanoid
+local root
+
+local flying = false
+local flyConnection
+
+local bodyVelocity
+local bodyGyro
+
+local upPressed = false
+local downPressed = false
+
+--========================================================
+-- CHARACTER
+--========================================================
+
+local function setupCharacter(char)
+	character = char
+	humanoid = char:WaitForChild("Humanoid")
+	root = char:WaitForChild("HumanoidRootPart")
+end
+
+setupCharacter(player.Character or player.CharacterAdded:Wait())
+
+--========================================================
+-- GUI
+--========================================================
+
+local oldGui = playerGui:FindFirstChild("FlyProPanel")
+
+if oldGui then
+	oldGui:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "FlyProPanel"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = playerGui
+
+--========================================================
+-- MAIN PANEL
+--========================================================
+
+local panel = Instance.new("Frame")
+panel.Name = "Panel"
+panel.Size = UDim2.new(0,310,0,300)
+panel.Position = UDim2.new(0.5,-155,0.5,-150)
+panel.BackgroundColor3 = Color3.fromRGB(12,16,20)
+panel.BackgroundTransparency = 0.05
+panel.Visible = false
+panel.Parent = gui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0,18)
+panelCorner.Parent = panel
+
+local panelStroke = Instance.new("UIStroke")
+panelStroke.Thickness = 2
+panelStroke.Color = Color3.fromRGB(0,220,190)
+panelStroke.Transparency = 0.15
+panelStroke.Parent = panel
+
+--========================================================
+-- HEADER
+--========================================================
+
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1,0,0,58)
+header.BackgroundTransparency = 1
+header.Parent = panel
+
+local title = Instance.new("TextLabel")
+title.BackgroundTransparency = 1
+title.Position = UDim2.new(0,18,0,7)
+title.Size = UDim2.new(1,-70,0,28)
+title.Text = "✈  FLY PRO"
+title.TextColor3 = Color3.fromRGB(240,255,255)
+title.TextSize = 20
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
+
+local subtitle = Instance.new("TextLabel")
+subtitle.BackgroundTransparency = 1
+subtitle.Position = UDim2.new(0,20,0,34)
+subtitle.Size = UDim2.new(1,-70,0,18)
+subtitle.Text = "ADVANCED FLIGHT CONTROL"
+subtitle.TextColor3 = Color3.fromRGB(110,140,145)
+subtitle.TextSize = 9
+subtitle.Font = Enum.Font.GothamMedium
+subtitle.TextXAlignment = Enum.TextXAlignment.Left
+subtitle.Parent = header
+
+--========================================================
+-- CLOSE
+--========================================================
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0,34,0,34)
+close.Position = UDim2.new(1,-44,0,12)
+close.BackgroundColor3 = Color3.fromRGB(30,35,40)
+close.Text = "×"
+close.TextSize = 22
+close.TextColor3 = Color3.fromRGB(220,230,230)
+close.Font = Enum.Font.GothamBold
+close.AutoButtonColor = false
+close.Parent = header
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0,10)
+closeCorner.Parent = close
+
+--========================================================
+-- STATUS
+--========================================================
+
+local statusFrame = Instance.new("Frame")
+statusFrame.Size = UDim2.new(1,-30,0,48)
+statusFrame.Position = UDim2.new(0,15,0,68)
+statusFrame.BackgroundColor3 = Color3.fromRGB(20,27,30)
+statusFrame.Parent = panel
+
+local statusCorner = Instance.new("UICorner")
+statusCorner.CornerRadius = UDim.new(0,12)
+statusCorner.Parent = statusFrame
+
+local status = Instance.new("TextLabel")
+status.BackgroundTransparency = 1
+status.Position = UDim2.new(0,15,0,0)
+status.Size = UDim2.new(0.65,0,1,0)
+status.Text = "STATUS  •  OFFLINE"
+status.TextColor3 = Color3.fromRGB(145,155,158)
+status.TextSize = 12
+status.Font = Enum.Font.GothamBold
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.Parent = statusFrame
+
+local dot = Instance.new("Frame")
+dot.Size = UDim2.new(0,10,0,10)
+dot.Position = UDim2.new(1,-25,0.5,-5)
+dot.BackgroundColor3 = Color3.fromRGB(120,125,125)
+dot.Parent = statusFrame
+
+local dotCorner = Instance.new("UICorner")
+dotCorner.CornerRadius = UDim.new(1,0)
+dotCorner.Parent = dot
+
+--========================================================
+-- SPEED LABEL
+--========================================================
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.BackgroundTransparency = 1
+speedLabel.Position = UDim2.new(0,18,0,130)
+speedLabel.Size = UDim2.new(1,-36,0,25)
+speedLabel.Text = "FLY SPEED     70"
+speedLabel.TextColor3 = Color3.fromRGB(220,235,235)
+speedLabel.TextSize = 12
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+speedLabel.Parent = panel
+
+--========================================================
+-- SPEED BAR
+--========================================================
+
+local speedBar = Instance.new("Frame")
+speedBar.Size = UDim2.new(1,-36,0,8)
+speedBar.Position = UDim2.new(0,18,0,160)
+speedBar.BackgroundColor3 = Color3.fromRGB(35,42,45)
+speedBar.Parent = panel
+
+local speedBarCorner = Instance.new("UICorner")
+speedBarCorner.CornerRadius = UDim.new(1,0)
+speedBarCorner.Parent = speedBar
+
+local speedFill = Instance.new("Frame")
+speedFill.Size = UDim2.new(0.33,0,1,0)
+speedFill.BackgroundColor3 = Color3.fromRGB(0,225,190)
+speedFill.Parent = speedBar
+
+local speedFillCorner = Instance.new("UICorner")
+speedFillCorner.CornerRadius = UDim.new(1,0)
+speedFillCorner.Parent = speedFill
+
+--========================================================
+-- SPEED BUTTONS
+--========================================================
+
+local minus = Instance.new("TextButton")
+minus.Size = UDim2.new(0,42,0,38)
+minus.Position = UDim2.new(0,18,0,180)
+minus.BackgroundColor3 = Color3.fromRGB(25,32,35)
+minus.Text = "−"
+minus.TextSize = 22
+minus.TextColor3 = Color3.fromRGB(220,235,235)
+minus.Font = Enum.Font.GothamBold
+minus.AutoButtonColor = false
+minus.Parent = panel
+
+local minusCorner = Instance.new("UICorner")
+minusCorner.CornerRadius = UDim.new(0,10)
+minusCorner.Parent = minus
+
+local plus = Instance.new("TextButton")
+plus.Size = UDim2.new(0,42,0,38)
+plus.Position = UDim2.new(1,-60,0,180)
+plus.BackgroundColor3 = Color3.fromRGB(25,32,35)
+plus.Text = "+"
+plus.TextSize = 22
+plus.TextColor3 = Color3.fromRGB(220,235,235)
+plus.Font = Enum.Font.GothamBold
+plus.AutoButtonColor = false
+plus.Parent = panel
+
+local plusCorner = Instance.new("UICorner")
+plusCorner.CornerRadius = UDim.new(0,10)
+plusCorner.Parent = plus
+
+--========================================================
+-- FLY BUTTON
+--========================================================
+
+local flyButton = Instance.new("TextButton")
+flyButton.Size = UDim2.new(1,-120,0,38)
+flyButton.Position = UDim2.new(0,60,0,180)
+flyButton.BackgroundColor3 = Color3.fromRGB(0,110,100)
+flyButton.Text = "ACTIVATE FLY"
+flyButton.TextColor3 = Color3.fromRGB(240,255,255)
+flyButton.TextSize = 12
+flyButton.Font = Enum.Font.GothamBold
+flyButton.AutoButtonColor = false
+flyButton.Parent = panel
+
+local flyCorner = Instance.new("UICorner")
+flyCorner.CornerRadius = UDim.new(0,10)
+flyCorner.Parent = flyButton
+
+--========================================================
+-- UP / DOWN
+--========================================================
+
+local up = Instance.new("TextButton")
+up.Size = UDim2.new(0,105,0,38)
+up.Position = UDim2.new(0,18,0,232)
+up.BackgroundColor3 = Color3.fromRGB(25,32,35)
+up.Text = "▲  UP"
+up.TextColor3 = Color3.fromRGB(220,240,240)
+up.TextSize = 12
+up.Font = Enum.Font.GothamBold
+up.AutoButtonColor = false
+up.Parent = panel
+
+local upCorner = Instance.new("UICorner")
+upCorner.CornerRadius = UDim.new(0,10)
+upCorner.Parent = up
+
+local down = Instance.new("TextButton")
+down.Size = UDim2.new(0,105,0,38)
+down.Position = UDim2.new(1,-123,0,232)
+down.BackgroundColor3 = Color3.fromRGB(25,32,35)
+down.Text = "▼  DOWN"
+down.TextColor3 = Color3.fromRGB(220,240,240)
+down.TextSize = 12
+down.Font = Enum.Font.GothamBold
+down.AutoButtonColor = false
+down.Parent = panel
+
+local downCorner = Instance.new("UICorner")
+downCorner.CornerRadius = UDim.new(0,10)
+downCorner.Parent = down
+
+--========================================================
+-- OPEN BUTTON
+--========================================================
+
+local openButton = Instance.new("TextButton")
+openButton.Size = UDim2.new(0,58,0,58)
+openButton.Position = UDim2.new(1,-75,0.5,-29)
+openButton.BackgroundColor3 = Color3.fromRGB(12,20,22)
+openButton.Text = "✈"
+openButton.TextSize = 26
+openButton.TextColor3 = Color3.fromRGB(0,235,200)
+openButton.Font = Enum.Font.GothamBold
+openButton.AutoButtonColor = false
+openButton.Parent = gui
+
+local openCorner = Instance.new("UICorner")
+openCorner.CornerRadius = UDim.new(0,17)
+openCorner.Parent = openButton
+
+local openStroke = Instance.new("UIStroke")
+openStroke.Thickness = 2
+openStroke.Color = Color3.fromRGB(0,210,180)
+openStroke.Parent = openButton
+
+--========================================================
+-- FLY SYSTEM
+--========================================================
+
+function stopFly()
+
+	flying = false
+
+	if flyConnection then
+		flyConnection:Disconnect()
+		flyConnection = nil
+	end
+
+	if bodyVelocity then
+		bodyVelocity:Destroy()
+		bodyVelocity = nil
+	end
+
+	if bodyGyro then
+		bodyGyro:Destroy()
+		bodyGyro = nil
+	end
+
+	if humanoid then
+		humanoid.PlatformStand = false
+	end
+
+	status.Text = "STATUS  •  OFFLINE"
+	status.TextColor3 = Color3.fromRGB(145,155,158)
+
+	dot.BackgroundColor3 = Color3.fromRGB(120,125,125)
+
+	flyButton.Text = "ACTIVATE FLY"
+	flyButton.BackgroundColor3 = Color3.fromRGB(0,110,100)
+end
+
+local function startFly()
+
+	if flying then
+		return
+	end
+
+	if not root or not humanoid then
+		return
+	end
+
+	if humanoid.Health <= 0 then
+		return
+	end
+
+	flying = true
+
+	humanoid.PlatformStand = true
+
+	bodyVelocity = Instance.new("BodyVelocity")
+	bodyVelocity.MaxForce = Vector3.new(
+		math.huge,
+		math.huge,
+		math.huge
+	)
+	bodyVelocity.P = 100000
+	bodyVelocity.Velocity = Vector3.zero
+	bodyVelocity.Parent = root
+
+	bodyGyro = Instance.new("BodyGyro")
+	bodyGyro.MaxTorque = Vector3.new(
+		math.huge,
+		math.huge,
+		math.huge
+	)
+	bodyGyro.P = 100000
+	bodyGyro.D = 1000
+	bodyGyro.CFrame = root.CFrame
+	bodyGyro.Parent = root
+
+	status.Text = "STATUS  •  ACTIVE"
+	status.TextColor3 = Color3.fromRGB(0,255,190)
+
+	dot.BackgroundColor3 = Color3.fromRGB(0,255,190)
+
+	flyButton.Text = "DEACTIVATE"
+	flyButton.BackgroundColor3 = Color3.fromRGB(0,160,135)
+
+	flyConnection = RunService.RenderStepped:Connect(function()
+
+		if not flying then
+			return
+		end
+
+		if not root
+			or not root.Parent
+			or not humanoid
+			or humanoid.Health <= 0 then
+
+			stopFly()
+			return
+		end
+
+		local camera = workspace.CurrentCamera
+
+		if not camera then
+			return
+		end
+
+		local move = humanoid.MoveDirection
+
+		local look = camera.CFrame.LookVector
+		local right = camera.CFrame.RightVector
+
+		local flatLook = Vector3.new(
+			look.X,
+			0,
+			look.Z
+		)
+
+		local flatRight = Vector3.new(
+			right.X,
+			0,
+			right.Z
+		)
+
+		if flatLook.Magnitude > 0 then
+			flatLook = flatLook.Unit
+		end
+
+		if flatRight.Magnitude > 0 then
+			flatRight = flatRight.Unit
+		end
+
+		local forwardAmount = move:Dot(flatLook)
+		local rightAmount = move:Dot(flatRight)
+
+		local direction =
+			flatLook * forwardAmount +
+			flatRight * rightAmount
+
+		local vertical = 0
+
+		if upPressed then
+			vertical = VERTICAL_SPEED
+		elseif downPressed then
+			vertical = -VERTICAL_SPEED
+		end
+
+		if direction.Magnitude > 0.01 then
+			direction = direction.Unit * FLY_SPEED
+		else
+			direction = Vector3.zero
+		end
+
+		bodyVelocity.Velocity =
+			direction + Vector3.new(0,vertical,0)
+
+		-- چرخش به سمت حرکت
+		if direction.Magnitude > 0.01 then
+
+			bodyGyro.CFrame = CFrame.lookAt(
+				root.Position,
+				root.Position + direction
+			)
+
+		end
+	end)
+end
+
+--========================================================
+-- FLY BUTTON
+--========================================================
+
+flyButton.Activated:Connect(function()
+
+	if flying then
+		stopFly()
+	else
+		startFly()
+	end
+
+end)
+
+--========================================================
+-- SPEED
+--========================================================
+
+minus.Activated:Connect(function()
+
+	FLY_SPEED = math.max(10,FLY_SPEED - 10)
+
+	speedLabel.Text = "FLY SPEED     "..FLY_SPEED
+
+	local percent = math.clamp(FLY_SPEED / 200,0.05,1)
+
+	TweenService:Create(
+		speedFill,
+		TweenInfo.new(0.15),
+		{
+			Size = UDim2.new(percent,0,1,0)
+		}
+	):Play()
+
+end)
+
+plus.Activated:Connect(function()
+
+	FLY_SPEED = math.min(200,FLY_SPEED + 10)
+
+	speedLabel.Text = "FLY SPEED     "..FLY_SPEED
+
+	local percent = math.clamp(FLY_SPEED / 200,0.05,1)
+
+	TweenService:Create(
+		speedFill,
+		TweenInfo.new(0.15),
+		{
+			Size = UDim2.new(percent,0,1,0)
+		}
+	):Play()
+
+end)
+
+--========================================================
+-- UP / DOWN
+--========================================================
+
+up.MouseButton1Down:Connect(function()
+	upPressed = true
+end)
+
+up.MouseButton1Up:Connect(function()
+	upPressed = false
+end)
+
+down.MouseButton1Down:Connect(function()
+	downPressed = true
+end)
+
+down.MouseButton1Up:Connect(function()
+	downPressed = false
+end)
+
+-- برای لمس موبایل
+up.TouchLongPress:Connect(function(_,state)
+	if state == Enum.UserInputState.Begin then
+		upPressed = true
+	elseif state == Enum.UserInputState.End then
+		upPressed = false
+	end
+end)
+
+down.TouchLongPress:Connect(function(_,state)
+	if state == Enum.UserInputState.Begin then
+		downPressed = true
+	elseif state == Enum.UserInputState.End then
+		downPressed = false
+	end
+end)
+
+--========================================================
+-- OPEN / CLOSE
+--========================================================
+
+openButton.Activated:Connect(function()
+
+	panel.Visible = true
+	panel.Size = UDim2.new(0,280,0,270)
+
+	TweenService:Create(
+		panel,
+		TweenInfo.new(
+			0.25,
+			Enum.EasingStyle.Back,
+			Enum.EasingDirection.Out
+		),
+		{
+			Size = UDim2.new(0,310,0,300)
+		}
+	):Play()
+
+	openButton.Visible = false
+
+end)
+
+close.Activated:Connect(function()
+
+	TweenService:Create(
+		panel,
+		TweenInfo.new(0.18),
+		{
+			Size = UDim2.new(0,280,0,270)
+		}
+	):Play()
+
+	task.wait(0.18)
+
+	panel.Visible = false
+	openButton.Visible = true
+
+end)
+
+--========================================================
+-- RESPAWN
+--========================================================
+
+player.CharacterAdded:Connect(function(char)
+
+	stopFly()
+
+	setupCharacter(char)
+
+end)
