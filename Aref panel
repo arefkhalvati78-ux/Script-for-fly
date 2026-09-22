@@ -1,0 +1,773 @@
+--========================================================--
+--                 AREFDGX PANEL V1.0                    --
+--        Fly + NoClip + Invisible + Draggable UI        --
+--========================================================--
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+--========================================================--
+-- SETTINGS
+--========================================================--
+
+local FlySpeed = 55
+local FlyEnabled = false
+local NoclipEnabled = false
+local InvisibleEnabled = false
+
+local Character
+local Humanoid
+local Root
+
+local function setupCharacter(char)
+	Character = char
+	Humanoid = char:WaitForChild("Humanoid")
+	Root = char:WaitForChild("HumanoidRootPart")
+end
+
+if Player.Character then
+	setupCharacter(Player.Character)
+end
+
+Player.CharacterAdded:Connect(function(char)
+	setupCharacter(char)
+
+	FlyEnabled = false
+	NoclipEnabled = false
+	InvisibleEnabled = false
+end)
+
+--========================================================--
+-- REMOVE OLD PANEL
+--========================================================--
+
+local old = PlayerGui:FindFirstChild("ArefdgxPanel")
+if old then
+	old:Destroy()
+end
+
+--========================================================--
+-- GUI
+--========================================================--
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "ArefdgxPanel"
+Gui.ResetOnSpawn = false
+Gui.IgnoreGuiInset = true
+Gui.Parent = PlayerGui
+
+--========================================================--
+-- MAIN PANEL
+--========================================================--
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.new(0, 330, 0, 390)
+Main.Position = UDim2.new(0.5, -165, 0.5, -195)
+Main.BackgroundColor3 = Color3.fromRGB(13, 17, 25)
+Main.BorderSizePixel = 0
+Main.Parent = Gui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 18)
+MainCorner.Parent = Main
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(50, 190, 170)
+Stroke.Thickness = 1.5
+Stroke.Transparency = 0.25
+Stroke.Parent = Main
+
+--========================================================--
+-- SHADOW
+--========================================================--
+
+local Shadow = Instance.new("ImageLabel")
+Shadow.Name = "Shadow"
+Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+Shadow.Position = UDim2.new(0.5, 0, 0.5, 7)
+Shadow.Size = UDim2.new(1, 45, 1, 45)
+Shadow.BackgroundTransparency = 1
+Shadow.Image = "rbxassetid://6014261993"
+Shadow.ImageTransparency = 0.55
+Shadow.ScaleType = Enum.ScaleType.Slice
+Shadow.SliceCenter = Rect.new(49, 49, 450, 450)
+Shadow.ZIndex = 0
+Shadow.Parent = Main
+
+Main.ZIndex = 2
+
+--========================================================--
+-- TOP BAR
+--========================================================--
+
+local Top = Instance.new("Frame")
+Top.Name = "TopBar"
+Top.Size = UDim2.new(1, 0, 0, 62)
+Top.BackgroundColor3 = Color3.fromRGB(18, 25, 35)
+Top.BorderSizePixel = 0
+Top.ZIndex = 5
+Top.Parent = Main
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 18)
+TopCorner.Parent = Top
+
+-- cover bottom corners
+local TopCover = Instance.new("Frame")
+TopCover.Size = UDim2.new(1, 0, 0, 18)
+TopCover.Position = UDim2.new(0, 0, 1, -18)
+TopCover.BackgroundColor3 = Color3.fromRGB(18, 25, 35)
+TopCover.BorderSizePixel = 0
+TopCover.ZIndex = 5
+TopCover.Parent = Top
+
+local Title = Instance.new("TextLabel")
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 20, 0, 7)
+Title.Size = UDim2.new(1, -75, 0, 28)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "AREFDGX PANEL"
+Title.TextColor3 = Color3.fromRGB(235, 255, 250)
+Title.TextSize = 19
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 7
+Title.Parent = Top
+
+local Subtitle = Instance.new("TextLabel")
+Subtitle.BackgroundTransparency = 1
+Subtitle.Position = UDim2.new(0, 21, 0, 34)
+Subtitle.Size = UDim2.new(1, -80, 0, 18)
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.Text = "CONTROL PANEL"
+Subtitle.TextColor3 = Color3.fromRGB(105, 180, 170)
+Subtitle.TextSize = 10
+Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+Subtitle.ZIndex = 7
+Subtitle.Parent = Top
+
+--========================================================--
+-- MINIMIZE BUTTON
+--========================================================--
+
+local Minimize = Instance.new("TextButton")
+Minimize.Name = "Minimize"
+Minimize.Size = UDim2.new(0, 40, 0, 40)
+Minimize.Position = UDim2.new(1, -50, 0, 11)
+Minimize.BackgroundColor3 = Color3.fromRGB(27, 38, 49)
+Minimize.Text = "−"
+Minimize.TextColor3 = Color3.fromRGB(220, 255, 250)
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextSize = 23
+Minimize.AutoButtonColor = false
+Minimize.ZIndex = 10
+Minimize.Parent = Top
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 12)
+MinCorner.Parent = Minimize
+
+--========================================================--
+-- CONTENT
+--========================================================--
+
+local Content = Instance.new("Frame")
+Content.Name = "Content"
+Content.Position = UDim2.new(0, 18, 0, 76)
+Content.Size = UDim2.new(1, -36, 1, -92)
+Content.BackgroundTransparency = 1
+Content.ZIndex = 4
+Content.Parent = Main
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0, 10)
+Layout.SortOrder = Enum.SortOrder.LayoutOrder
+Layout.Parent = Content
+
+--========================================================--
+-- BUTTON CREATOR
+--========================================================--
+
+local function createButton(name, icon, order)
+	local Button = Instance.new("TextButton")
+	Button.Name = name
+	Button.Size = UDim2.new(1, 0, 0, 58)
+	Button.BackgroundColor3 = Color3.fromRGB(22, 30, 40)
+	Button.BorderSizePixel = 0
+	Button.AutoButtonColor = false
+	Button.Text = ""
+	Button.LayoutOrder = order
+	Button.ZIndex = 6
+	Button.Parent = Content
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 14)
+	Corner.Parent = Button
+
+	local ButtonStroke = Instance.new("UIStroke")
+	ButtonStroke.Color = Color3.fromRGB(45, 65, 76)
+	ButtonStroke.Thickness = 1
+	ButtonStroke.Transparency = 0.25
+	ButtonStroke.Parent = Button
+
+	local Icon = Instance.new("TextLabel")
+	Icon.BackgroundTransparency = 1
+	Icon.Position = UDim2.new(0, 16, 0, 0)
+	Icon.Size = UDim2.new(0, 35, 1, 0)
+	Icon.Font = Enum.Font.GothamBold
+	Icon.Text = icon
+	Icon.TextSize = 22
+	Icon.TextColor3 = Color3.fromRGB(115, 220, 205)
+	Icon.ZIndex = 7
+	Icon.Parent = Button
+
+	local Label = Instance.new("TextLabel")
+	Label.BackgroundTransparency = 1
+	Label.Position = UDim2.new(0, 57, 0, 7)
+	Label.Size = UDim2.new(1, -130, 0, 25)
+	Label.Font = Enum.Font.GothamBold
+	Label.Text = name
+	Label.TextColor3 = Color3.fromRGB(235, 240, 245)
+	Label.TextSize = 14
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+	Label.ZIndex = 7
+	Label.Parent = Button
+
+	local Status = Instance.new("TextLabel")
+	Status.BackgroundTransparency = 1
+	Status.Position = UDim2.new(0, 57, 0, 30)
+	Status.Size = UDim2.new(1, -130, 0, 18)
+	Status.Font = Enum.Font.Gotham
+	Status.Text = "OFF"
+	Status.TextColor3 = Color3.fromRGB(125, 135, 145)
+	Status.TextSize = 10
+	Status.TextXAlignment = Enum.TextXAlignment.Left
+	Status.ZIndex = 7
+	Status.Parent = Button
+
+	local Indicator = Instance.new("Frame")
+	Indicator.Size = UDim2.new(0, 9, 0, 9)
+	Indicator.Position = UDim2.new(1, -27, 0.5, -4)
+	Indicator.BackgroundColor3 = Color3.fromRGB(90, 100, 110)
+	Indicator.BorderSizePixel = 0
+	Indicator.ZIndex = 8
+	Indicator.Parent = Button
+
+	local IndCorner = Instance.new("UICorner")
+	IndCorner.CornerRadius = UDim.new(1, 0)
+	IndCorner.Parent = Indicator
+
+	-- hover animation
+	Button.MouseEnter:Connect(function()
+		TweenService:Create(
+			Button,
+			TweenInfo.new(0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+			{
+				BackgroundColor3 = Color3.fromRGB(29, 42, 52)
+			}
+		):Play()
+
+		TweenService:Create(
+			ButtonStroke,
+			TweenInfo.new(0.18),
+			{
+				Color = Color3.fromRGB(65, 190, 175),
+				Transparency = 0
+			}
+		):Play()
+	end)
+
+	Button.MouseLeave:Connect(function()
+		TweenService:Create(
+			Button,
+			TweenInfo.new(0.18),
+			{
+				BackgroundColor3 = Color3.fromRGB(22, 30, 40)
+			}
+		):Play()
+
+		TweenService:Create(
+			ButtonStroke,
+			TweenInfo.new(0.18),
+			{
+				Color = Color3.fromRGB(45, 65, 76),
+				Transparency = 0.25
+			}
+		):Play()
+	end)
+
+	Button.MouseButton1Down:Connect(function()
+		TweenService:Create(
+			Button,
+			TweenInfo.new(0.08),
+			{
+				Size = UDim2.new(1, -5, 0, 55)
+			}
+		):Play()
+	end)
+
+	Button.MouseButton1Up:Connect(function()
+		TweenService:Create(
+			Button,
+			TweenInfo.new(0.12, Enum.EasingStyle.Back),
+			{
+				Size = UDim2.new(1, 0, 0, 58)
+			}
+		):Play()
+	end)
+
+	return Button, Status, Indicator
+end
+
+--========================================================--
+-- CREATE BUTTONS
+--========================================================--
+
+local FlyButton, FlyStatus, FlyIndicator =
+	createButton("FLY", "✈", 1)
+
+local NoclipButton, NoclipStatus, NoclipIndicator =
+	createButton("NOCLIP", "◈", 2)
+
+local InvisibleButton, InvisibleStatus, InvisibleIndicator =
+	createButton("INVISIBLE", "◉", 3)
+
+--========================================================--
+-- SPEED CONTROL
+--========================================================--
+
+local SpeedFrame = Instance.new("Frame")
+SpeedFrame.Size = UDim2.new(1, 0, 0, 52)
+SpeedFrame.BackgroundColor3 = Color3.fromRGB(22, 30, 40)
+SpeedFrame.BorderSizePixel = 0
+SpeedFrame.LayoutOrder = 4
+SpeedFrame.ZIndex = 6
+SpeedFrame.Parent = Content
+
+local SpeedCorner = Instance.new("UICorner")
+SpeedCorner.CornerRadius = UDim.new(0, 14)
+SpeedCorner.Parent = SpeedFrame
+
+local SpeedText = Instance.new("TextLabel")
+SpeedText.BackgroundTransparency = 1
+SpeedText.Position = UDim2.new(0, 15, 0, 0)
+SpeedText.Size = UDim2.new(0, 80, 1, 0)
+SpeedText.Font = Enum.Font.GothamBold
+SpeedText.Text = "SPEED"
+SpeedText.TextColor3 = Color3.fromRGB(220, 230, 235)
+SpeedText.TextSize = 13
+SpeedText.TextXAlignment = Enum.TextXAlignment.Left
+SpeedText.ZIndex = 7
+SpeedText.Parent = SpeedFrame
+
+local Minus = Instance.new("TextButton")
+Minus.Size = UDim2.new(0, 38, 0, 34)
+Minus.Position = UDim2.new(1, -145, 0.5, -17)
+Minus.BackgroundColor3 = Color3.fromRGB(30, 42, 52)
+Minus.Text = "−"
+Minus.TextColor3 = Color3.fromRGB(220, 250, 245)
+Minus.Font = Enum.Font.GothamBold
+Minus.TextSize = 20
+Minus.AutoButtonColor = false
+Minus.ZIndex = 7
+Minus.Parent = SpeedFrame
+
+local Plus = Instance.new("TextButton")
+Plus.Size = UDim2.new(0, 38, 0, 34)
+Plus.Position = UDim2.new(1, -48, 0.5, -17)
+Plus.BackgroundColor3 = Color3.fromRGB(30, 42, 52)
+Plus.Text = "+"
+Plus.TextColor3 = Color3.fromRGB(220, 250, 245)
+Plus.Font = Enum.Font.GothamBold
+Plus.TextSize = 20
+Plus.AutoButtonColor = false
+Plus.ZIndex = 7
+Plus.Parent = SpeedFrame
+
+local SpeedValue = Instance.new("TextLabel")
+SpeedValue.BackgroundTransparency = 1
+SpeedValue.Position = UDim2.new(1, -102, 0, 0)
+SpeedValue.Size = UDim2.new(0, 55, 1, 0)
+SpeedValue.Font = Enum.Font.GothamBold
+SpeedValue.Text = tostring(FlySpeed)
+SpeedValue.TextColor3 = Color3.fromRGB(90, 220, 200)
+SpeedValue.TextSize = 14
+SpeedValue.ZIndex = 7
+SpeedValue.Parent = SpeedFrame
+
+for _, b in ipairs({Minus, Plus}) do
+	b.MouseEnter:Connect(function()
+		TweenService:Create(
+			b,
+			TweenInfo.new(0.15),
+			{BackgroundColor3 = Color3.fromRGB(40, 70, 75)}
+		):Play()
+	end)
+
+	b.MouseLeave:Connect(function()
+		TweenService:Create(
+			b,
+			TweenInfo.new(0.15),
+			{BackgroundColor3 = Color3.fromRGB(30, 42, 52)}
+		):Play()
+	end)
+end
+
+Minus.MouseButton1Click:Connect(function()
+	FlySpeed = math.max(10, FlySpeed - 5)
+	SpeedValue.Text = tostring(FlySpeed)
+end)
+
+Plus.MouseButton1Click:Connect(function()
+	FlySpeed = math.min(250, FlySpeed + 5)
+	SpeedValue.Text = tostring(FlySpeed)
+end)
+
+--========================================================--
+-- STATUS FUNCTION
+--========================================================--
+
+local function setStatus(statusLabel, indicator, enabled)
+	if enabled then
+		statusLabel.Text = "ON"
+		statusLabel.TextColor3 = Color3.fromRGB(80, 220, 190)
+
+		TweenService:Create(
+			indicator,
+			TweenInfo.new(0.2),
+			{
+				BackgroundColor3 = Color3.fromRGB(80, 230, 190)
+			}
+		):Play()
+	else
+		statusLabel.Text = "OFF"
+		statusLabel.TextColor3 = Color3.fromRGB(125, 135, 145)
+
+		TweenService:Create(
+			indicator,
+			TweenInfo.new(0.2),
+			{
+				BackgroundColor3 = Color3.fromRGB(90, 100, 110)
+			}
+		):Play()
+	end
+end
+
+--========================================================--
+-- FLY
+--========================================================--
+
+local FlyVelocity
+local FlyGyro
+
+local function stopFly()
+	if FlyVelocity then
+		FlyVelocity:Destroy()
+		FlyVelocity = nil
+	end
+
+	if FlyGyro then
+		FlyGyro:Destroy()
+		FlyGyro = nil
+	end
+
+	if Humanoid then
+		Humanoid.PlatformStand = false
+	end
+end
+
+local function startFly()
+	if not Character or not Root or not Humanoid then
+		return
+	end
+
+	stopFly()
+
+	FlyVelocity = Instance.new("BodyVelocity")
+	FlyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+	FlyVelocity.Velocity = Vector3.zero
+	FlyVelocity.Parent = Root
+
+	FlyGyro = Instance.new("BodyGyro")
+	FlyGyro.MaxTorque = Vector3.new(100000, 100000, 100000)
+	FlyGyro.P = 10000
+	FlyGyro.CFrame = workspace.CurrentCamera.CFrame
+	FlyGyro.Parent = Root
+
+	Humanoid.PlatformStand = true
+end
+
+FlyButton.MouseButton1Click:Connect(function()
+	FlyEnabled = not FlyEnabled
+
+	if FlyEnabled then
+		startFly()
+	else
+		stopFly()
+	end
+
+	setStatus(FlyStatus, FlyIndicator, FlyEnabled)
+end)
+
+--========================================================--
+-- NOCLIP
+--========================================================--
+
+NoclipButton.MouseButton1Click:Connect(function()
+	NoclipEnabled = not NoclipEnabled
+	setStatus(NoclipStatus, NoclipIndicator, NoclipEnabled)
+
+	if not NoclipEnabled and Character then
+		for _, obj in ipairs(Character:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				obj.CanCollide = true
+			end
+		end
+	end
+end)
+
+--========================================================--
+-- INVISIBLE
+--========================================================--
+
+local OriginalTransparency = {}
+
+local function setInvisible(enabled)
+	if not Character then
+		return
+	end
+
+	if enabled then
+		OriginalTransparency = {}
+
+		for _, obj in ipairs(Character:GetDescendants()) do
+			if obj:IsA("BasePart") or obj:IsA("Decal") then
+				OriginalTransparency[obj] = obj.Transparency
+				obj.Transparency = 1
+			end
+		end
+	else
+		for obj, transparency in pairs(OriginalTransparency) do
+			if obj and obj.Parent then
+				obj.Transparency = transparency
+			end
+		end
+
+		OriginalTransparency = {}
+	end
+end
+
+InvisibleButton.MouseButton1Click:Connect(function()
+	InvisibleEnabled = not InvisibleEnabled
+
+	setInvisible(InvisibleEnabled)
+	setStatus(InvisibleStatus, InvisibleIndicator, InvisibleEnabled)
+end)
+
+--========================================================--
+-- FLY MOVEMENT
+--========================================================--
+
+RunService.RenderStepped:Connect(function()
+	if not Character or not Root then
+		return
+	end
+
+	-- NOCLIP
+	if NoclipEnabled then
+		for _, obj in ipairs(Character:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				obj.CanCollide = false
+			end
+		end
+	end
+
+	-- FLY
+	if FlyEnabled and FlyVelocity and FlyGyro then
+		local Camera = workspace.CurrentCamera
+		local Move = Vector3.zero
+
+		if UIS:IsKeyDown(Enum.KeyCode.W) then
+			Move += Camera.CFrame.LookVector
+		end
+
+		if UIS:IsKeyDown(Enum.KeyCode.S) then
+			Move -= Camera.CFrame.LookVector
+		end
+
+		if UIS:IsKeyDown(Enum.KeyCode.A) then
+			Move -= Camera.CFrame.RightVector
+		end
+
+		if UIS:IsKeyDown(Enum.KeyCode.D) then
+			Move += Camera.CFrame.RightVector
+		end
+
+		if UIS:IsKeyDown(Enum.KeyCode.Space) then
+			Move += Vector3.new(0, 1, 0)
+		end
+
+		if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
+			Move -= Vector3.new(0, 1, 0)
+		end
+
+		if Move.Magnitude > 0 then
+			Move = Move.Unit * FlySpeed
+		end
+
+		FlyVelocity.Velocity = Move
+
+		local Look = Camera.CFrame.LookVector
+
+		FlyGyro.CFrame = CFrame.lookAt(
+			Root.Position,
+			Root.Position + Look
+		)
+	end
+end)
+
+--========================================================--
+-- DRAG SYSTEM
+-- گرفتن نوار بالایی و کشیدن پنل
+--========================================================--
+
+local Dragging = false
+local DragStart
+local StartPosition
+
+local function updateDrag(input)
+	local Delta = input.Position - DragStart
+
+	Main.Position = UDim2.new(
+		StartPosition.X.Scale,
+		StartPosition.X.Offset + Delta.X,
+		StartPosition.Y.Scale,
+		StartPosition.Y.Offset + Delta.Y
+	)
+end
+
+Top.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		Dragging = true
+		DragStart = input.Position
+		StartPosition = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				Dragging = false
+			end
+		end)
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if Dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
+		updateDrag(input)
+	end
+end)
+
+--========================================================--
+-- MINIMIZE / EXPAND
+--========================================================--
+
+local Minimized = false
+local FullSize = UDim2.new(0, 330, 0, 390)
+local SmallSize = UDim2.new(0, 330, 0, 62)
+
+Minimize.MouseButton1Click:Connect(function()
+	Minimized = not Minimized
+
+	if Minimized then
+		Minimize.Text = "+"
+		
+		TweenService:Create(
+			Main,
+			TweenInfo.new(
+				0.35,
+				Enum.EasingStyle.Quint,
+				Enum.EasingDirection.Out
+			),
+			{
+				Size = SmallSize
+			}
+		):Play()
+
+		Content.Visible = false
+	else
+		Minimize.Text = "−"
+		Content.Visible = true
+
+		TweenService:Create(
+			Main,
+			TweenInfo.new(
+				0.4,
+				Enum.EasingStyle.Back,
+				Enum.EasingDirection.Out
+			),
+			{
+				Size = FullSize
+			}
+		):Play()
+	end
+end)
+
+--========================================================--
+-- OPEN ANIMATION
+--========================================================--
+
+Main.Size = UDim2.new(0, 0, 0, 0)
+Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+TweenService:Create(
+	Main,
+	TweenInfo.new(
+		0.55,
+		Enum.EasingStyle.Back,
+		Enum.EasingDirection.Out
+	),
+	{
+		Size = FullSize,
+		Position = UDim2.new(0.5, -165, 0.5, -195)
+	}
+):Play()
+
+--========================================================--
+-- PC SHORTCUT
+-- RightShift = Show / Hide
+--========================================================--
+
+local PanelVisible = true
+
+UIS.InputBegan:Connect(function(input, processed)
+	if processed then
+		return
+	end
+
+	if input.KeyCode == Enum.KeyCode.RightShift then
+		PanelVisible = not PanelVisible
+
+		if PanelVisible then
+			Main.Visible = true
+
+			TweenService:Create(
+				Main,
+				TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+				{
+					GroupTransparency = 0
+				}
+			):Play()
+		else
+			Main.Visible = false
+		end
+	end
+end)
