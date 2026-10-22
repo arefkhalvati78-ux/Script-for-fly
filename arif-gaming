@@ -1,0 +1,724 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d12">
+<meta name="description" content="ARIF GAMING - دنیای بازی و گیمینگ">
+<title>ARIF GAMING | دنیای بازی</title>
+
+<style>
+:root {
+  --bg: #080d12;
+  --panel: #101a21;
+  --green: #39ff9c;
+  --white: #f5f8fa;
+  --muted: #9aabb6;
+  --border: #25352f;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  font-family: Tahoma, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px 6%;
+  background: rgba(8,13,18,.94);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  color: var(--green);
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+nav a {
+  font-size: 13px;
+  color: var(--muted);
+  transition: .2s;
+}
+
+nav a:hover {
+  color: var(--green);
+}
+
+.menu-button {
+  display: none;
+  color: var(--green);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 21px;
+}
+
+.hero {
+  min-height: 510px;
+  padding: 95px 20px 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, #164a34 0%, transparent 60%),
+    linear-gradient(180deg, #0b1717, var(--bg));
+  position: relative;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 70%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 15px;
+  border: 1px solid #28694d;
+  border-radius: 30px;
+  color: var(--green);
+  background: #0c2018;
+  font-size: 12px;
+}
+
+h1 {
+  font-size: clamp(34px, 8vw, 62px);
+  line-height: 1.5;
+  margin: 20px 0 12px;
+  font-weight: 900;
+}
+
+h1 span {
+  color: var(--green);
+  text-shadow: 0 0 25px #39ff9c33;
+}
+
+.hero p {
+  color: var(--muted);
+  max-width: 480px;
+  font-size: 14px;
+  margin-bottom: 26px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  border-radius: 9px;
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: #07130d;
+  font-size: 13px;
+  font-weight: bold;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 22px #39ff9c30;
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--green);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 600px;
+  width: 90%;
+  margin: -1px auto 0;
+  border: 1px solid var(--border);
+  border-radius: 0 0 15px 15px;
+  background: var(--panel);
+}
+
+.stat {
+  text-align: center;
+  padding: 16px 8px;
+}
+
+.stat strong {
+  display: block;
+  color: var(--green);
+  font-size: 21px;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+section.content {
+  padding: 65px 6%;
+}
+
+.section-heading {
+  margin-bottom: 25px;
+}
+
+.section-heading h2 {
+  font-size: 25px;
+  margin-bottom: 5px;
+}
+
+.section-heading h2 span {
+  color: var(--green);
+}
+
+.section-heading p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.search-box {
+  margin-bottom: 22px;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 450px;
+  padding: 12px 15px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--white);
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--green);
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.game-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--panel);
+  transition: transform .25s, border-color .25s;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--green);
+}
+
+.game-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background: #172820;
+}
+
+.game-info {
+  padding: 17px;
+}
+
+.game-tag {
+  display: inline-block;
+  color: var(--green);
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+
+.game-info h3 {
+  font-size: 17px;
+  margin-bottom: 7px;
+}
+
+.game-info p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 15px;
+}
+
+.card-button {
+  width: 100%;
+  border: 1px solid #28694d;
+  background: #0b2117;
+  color: var(--green);
+  border-radius: 8px;
+  padding: 9px;
+  font-size: 12px;
+  transition: .2s;
+}
+
+.card-button:hover {
+  background: var(--green);
+  color: #07130d;
+}
+
+.no-results {
+  color: var(--muted);
+  padding: 15px 0;
+}
+
+.about {
+  background: #0c141a;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.about-inner {
+  max-width: 700px;
+}
+
+.about-inner p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 15px 0 22px;
+}
+
+.message {
+  color: var(--green) !important;
+  min-height: 28px;
+}
+
+.contact-box {
+  padding: 25px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 14px;
+}
+
+.contact-box p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 8px 0 18px;
+}
+
+footer {
+  padding: 27px 15px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+footer strong {
+  color: var(--green);
+}
+
+footer a {
+  color: var(--green);
+}
+
+dialog {
+  width: calc(100% - 36px);
+  max-width: 430px;
+  margin: auto;
+  padding: 25px;
+  border: 1px solid var(--green);
+  border-radius: 16px;
+  background: #101a21;
+  color: var(--white);
+}
+
+dialog::backdrop {
+  background: #000b;
+}
+
+dialog h3 {
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+dialog p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+  header {
+    padding: 12px 5%;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 5%;
+    background: #0b1218;
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav.open {
+    display: flex;
+  }
+
+  nav a {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .hero {
+    min-height: 430px;
+    padding-top: 65px;
+  }
+
+  section.content {
+    padding: 45px 5%;
+  }
+
+  .games {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .game-image {
+    aspect-ratio: 16 / 8;
+  }
+
+  .game-info {
+    padding: 15px;
+  }
+
+  .stats {
+    width: 92%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a class="logo" href="#home">ARIF GAMING</a>
+
+  <button class="menu-button" id="menuButton"
+          aria-label="باز کردن منو"
+          aria-expanded="false">☰</button>
+
+  <nav id="navigation">
+    <a href="#home">خانه</a>
+    <a href="#games">بازی‌ها</a>
+    <a href="#about">درباره من</a>
+    <a href="#contact">ارتباط</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <span class="badge">دنیای بازی و خلاقیت</span>
+
+    <h1>بازی کن، بساز،<br>
+      <span>متفاوت باش!</span>
+    </h1>
+
+    <p>
+      به دنیای ARIF GAMING خوش آمدی؛
+      جایی برای بازی‌ها، ایده‌های جدید و پروژه‌های من.
+    </p>
+
+    <div class="buttons">
+      <a href="#games" class="btn">🎮 مشاهده بازی‌ها</a>
+      <a href="#about" class="btn secondary">درباره من</a>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">
+      <strong>∞</strong>
+      <span>ایده‌های جدید</span>
+    </div>
+    <div class="stat">
+      <strong>24/7</strong>
+      <span>علاقه به بازی</span>
+    </div>
+    <div class="stat">
+      <strong>100%</strong>
+      <span>خلاقیت</span>
+    </div>
+  </div>
+
+  <section class="content" id="games">
+    <div class="section-heading">
+      <h2>پروژه‌های <span>من</span></h2>
+      <p>بازی مورد علاقه‌ات را پیدا کن.</p>
+    </div>
+
+    <div class="search-box">
+      <input id="gameSearch" type="search"
+             placeholder="🔎 جست‌وجوی بازی..."
+             aria-label="جست‌وجوی بازی">
+    </div>
+
+    <div class="games" id="gamesGrid">
+
+      <article class="game-card" data-name="roblox روبلاکس">
+        <img class="game-image"
+             src="https://placehold.co/600x340/10251d/39ff9c?text=ROBLOX"
+             alt="تصویر نمونه پروژه روبلاکس"
+             loading="lazy">
+
+        <div class="game-info">
+          <span class="game-tag">GAME PROJECT</span>
+          <h3>پروژه روبلاکس</h3>
+          <p>ایده‌ها و تجربه‌های من در دنیای Roblox.</p>
+          <button class="card-button"
+                  data-title="پروژه روبلاکس"
+                  data-description="این قسمت برای معرفی بازی روبلاکس تو آماده شده است. بعداً می‌توانی لینک بازی خودت را اضافه کنی.">
+            مشاهده جزئیات
+          </button>
+        </div>
+      </article>
+
+      <article class="game-card" data-name="action اکشن">
+        <img class="game-image"
+             src="https://placehold.co/600x340/24131c/ff6b91?text=ACTION"
+             alt="تصویر نمونه بازی اکشن"
+             loading="lazy">
+
+        <div class="game-info">
+          <span class="game-tag">ACTION GAME</span>
+          <h3>بازی اکشن</h3>
+          <p>یک ایده برای ساخت یک بازی هیجان‌انگیز.</p>
+          <button class="card-button"
+                  data-title="بازی اکشن"
+                  data-description="اینجا می‌توانی درباره بازی اکشنی که می‌سازی توضیح بدهی.">
+            مشاهده جزئیات
+          </button>
+        </div>
+      </article>
+
+      <article class="game-card" data-name="survival بقا">
+        <img class="game-image"
+             src="https://placehold.co/600x340/152035/71a7ff?text=SURVIVAL"
+             alt="تصویر نمونه بازی بقا"
+             loading="lazy">
+
+        <div class="game-info">
+          <span class="game-tag">SURVIVAL GAME</span>
+          <h3>بازی بقا</h3>
+          <p>یک ماجراجویی برای زنده ماندن و کشف دنیا.</p>
+          <button class="card-button"
+                  data-title="بازی بقا"
+                  data-description="این بخش برای معرفی پروژه بازی بقای تو است.">
+            مشاهده جزئیات
+          </button>
+        </div>
+      </article>
+
+    </div>
+
+    <p class="no-results" id="noResults" hidden>
+      بازی‌ای با این نام پیدا نشد.
+    </p>
+  </section>
+
+  <section class="content about" id="about">
+    <div class="about-inner">
+      <div class="section-heading">
+        <h2>درباره <span>من</span></h2>
+        <p>یک سازنده، هزاران ایده.</p>
+      </div>
+
+      <p>
+        من به بازی‌سازی، برنامه‌نویسی و طراحی علاقه دارم.
+        این سایت را ساخته‌ام تا پروژه‌ها و ایده‌هایم را
+        به دیگران معرفی کنم.
+      </p>
+
+      <button class="btn" id="helloButton">
+        روی من کلیک کن
+      </button>
+
+      <p class="message" id="helloMessage"
+         aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="content" id="contact">
+    <div class="contact-box">
+      <div class="section-heading">
+        <h2>ارتباط با <span>من</span></h2>
+        <p>این بخش را می‌توانی بعداً با لینک‌های واقعی خودت کامل کنی.</p>
+      </div>
+
+      <p>
+        وقتی صفحه یا کانال رسمی خودت را ساختی،
+        می‌توانی لینک آن را در این قسمت قرار بدهی.
+      </p>
+
+      <a class="btn secondary" href="#home">بازگشت به بالا ↑</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  ساخته‌شده با علاقه توسط <strong>ARIF GAMING</strong>
+  <br>
+  <span>© <span id="year"></span> تمام حقوق محفوظ است.</span>
+</footer>
+
+<dialog id="gameDialog">
+  <h3 id="dialogTitle">جزئیات بازی</h3>
+  <p id="dialogDescription"></p>
+  <button class="btn" id="closeDialog">بستن</button>
+</dialog>
+
+<script>
+const menuButton = document.getElementById("menuButton");
+const navigation = document.getElementById("navigation");
+
+menuButton.addEventListener("click", function () {
+  const isOpen = navigation.classList.toggle("open");
+  menuButton.setAttribute("aria-expanded", String(isOpen));
+  menuButton.textContent = isOpen ? "✕" : "☰";
+});
+
+navigation.querySelectorAll("a").forEach(function (link) {
+  link.addEventListener("click", function () {
+    navigation.classList.remove("open");
+    menuButton.setAttribute("aria-expanded", "false");
+    menuButton.textContent = "☰";
+  });
+});
+
+const searchInput = document.getElementById("gameSearch");
+const gameCards = document.querySelectorAll(".game-card");
+const noResults = document.getElementById("noResults");
+
+searchInput.addEventListener("input", function () {
+  const query = searchInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+
+  gameCards.forEach(function (card) {
+    const name = card.dataset.name.toLowerCase();
+    const title = card.querySelector("h3").textContent.toLowerCase();
+    const matches = name.includes(query) || title.includes(query);
+
+    card.hidden = !matches;
+    if (matches) visibleCount++;
+  });
+
+  noResults.hidden = visibleCount !== 0;
+});
+
+document.getElementById("helloButton")
+  .addEventListener("click", function () {
+    document.getElementById("helloMessage").textContent =
+      "به ARIF GAMING خوش آمدی! ممنون که از سایت من دیدن کردی.";
+  });
+
+const dialog = document.getElementById("gameDialog");
+
+document.querySelectorAll(".card-button").forEach(function (button) {
+  button.addEventListener("click", function () {
+    document.getElementById("dialogTitle").textContent =
+      button.dataset.title;
+
+    document.getElementById("dialogDescription").textContent =
+      button.dataset.description;
+
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      alert(button.dataset.title + "\n" + button.dataset.description);
+    }
+  });
+});
+
+document.getElementById("closeDialog")
+  .addEventListener("click", function () {
+    dialog.close();
+  });
+
+dialog.addEventListener("click", function (event) {
+  if (event.target === dialog) {
+    dialog.close();
+  }
+});
+
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+</script>
+
+</body>
+</html>
